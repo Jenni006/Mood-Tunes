@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { MoodInput } from '@/components/MoodInput';
 import { RecommendationList } from '@/components/RecommendationList';
+import { UserMenu } from '@/components/auth/UserMenu';
+import { useAuth } from '@/contexts/AuthContext';
 import heroImage from '@/assets/hero-music.jpg';
-import { Headphones, Star, Users } from 'lucide-react';
+import { Headphones, Star, Users, Crown } from 'lucide-react';
 
 interface Recommendation {
   id: string;
@@ -120,6 +122,7 @@ const getMockRecommendations = (mood: string): Recommendation[] => {
 };
 
 const Index = () => {
+  const { user, loading: authLoading } = useAuth();
   const [currentMood, setCurrentMood] = useState<string>('');
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,6 +154,11 @@ const Index = () => {
           style={{ backgroundImage: `url(${heroImage})` }}
         />
         <div className="relative container mx-auto px-4 py-20">
+          {/* Navigation */}
+          <div className="absolute top-8 right-8">
+            <UserMenu />
+          </div>
+          
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
               <div className="p-4 bg-gradient-accent rounded-full shadow-glow">
@@ -201,19 +209,34 @@ const Index = () => {
           )}
         </div>
 
-        {/* Feature Preview for Auth & Payment */}
+        {/* Premium Features Section */}
         {currentMood && (
           <div className="mt-20 text-center max-w-3xl mx-auto">
-            <div className="p-8 bg-gradient-secondary border border-purple/20 rounded-2xl backdrop-blur-sm">
-              <h3 className="text-2xl font-bold mb-4">Want More Personalized Recommendations?</h3>
-              <p className="text-muted-foreground mb-6">
-                Sign up for unlimited mood recommendations, playlist creation, and premium features including 
-                Spotify integration and advanced AI recommendations.
-              </p>
-              <div className="text-sm text-muted-foreground">
-                🔒 Authentication & 💳 Payment features coming soon with Supabase integration
+            {user ? (
+              <div className="p-8 bg-gradient-accent/20 border border-primary/30 rounded-2xl backdrop-blur-sm">
+                <div className="flex items-center justify-center mb-4">
+                  <Crown className="h-8 w-8 text-primary-glow mr-3" />
+                  <h3 className="text-2xl font-bold">Premium Member Benefits</h3>
+                </div>
+                <p className="text-foreground/80 mb-6">
+                  🎵 Unlimited mood recommendations • 📝 Save favorite tracks • 🎯 Personalized playlists
+                </p>
+                <div className="text-sm text-primary-glow font-medium">
+                  Welcome back, {user.email?.split('@')[0]}! Enjoy your premium experience.
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-8 bg-gradient-secondary border border-purple/20 rounded-2xl backdrop-blur-sm">
+                <h3 className="text-2xl font-bold mb-4">Want More Personalized Recommendations?</h3>
+                <p className="text-muted-foreground mb-6">
+                  Sign up for unlimited mood recommendations, playlist creation, and premium features including 
+                  Spotify integration and advanced AI recommendations.
+                </p>
+                <div className="text-sm text-muted-foreground">
+                  💳 Payment features coming soon to unlock premium benefits
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
