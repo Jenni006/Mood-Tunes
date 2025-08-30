@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MoodInput } from '@/components/MoodInput';
 import { RecommendationList } from '@/components/RecommendationList';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import heroImage from '@/assets/hero-music.jpg';
 import { Headphones, Star, Users, Crown } from 'lucide-react';
 
@@ -123,9 +127,16 @@ const getMockRecommendations = (mood: string): Recommendation[] => {
 
 const Index = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [currentMood, setCurrentMood] = useState<string>('');
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleMoodSubmit = async (mood: string) => {
     setIsLoading(true);
@@ -144,6 +155,38 @@ const Index = () => {
       handleMoodSubmit(currentMood);
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
+        <Card className="bg-card/90 backdrop-blur-sm border-primary/20 p-8">
+          <CardContent className="flex items-center space-x-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <span className="text-foreground">Loading...</span>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm border-primary/20">
+          <CardContent className="text-center space-y-6 pt-6">
+            <h2 className="text-2xl font-bold text-foreground">Welcome to MoodTunes</h2>
+            <p className="text-muted-foreground">Please sign in to access your personalized music experience.</p>
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="w-full bg-gradient-accent text-white hover:opacity-90"
+            >
+              Sign In
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-primary">
