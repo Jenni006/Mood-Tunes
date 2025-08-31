@@ -25,7 +25,7 @@ export default function Auth() {
   const navigate = useNavigate();
   useEffect(() => {
     if (user) {
-      navigate('/');
+      navigate('/player');
     }
   }, [user, navigate]);
   const handleSubmit = async (e: React.FormEvent) => {

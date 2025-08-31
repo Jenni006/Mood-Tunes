@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useProfile } from '@/hooks/useProfile';
 import { AuthModal } from './AuthModal';
 import { User, LogOut, Crown, Settings, CreditCard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 export function UserMenu() {
   const { user, signOut } = useAuth();
   const { subscribed, subscription_tier } = useSubscription();
+  const { profile } = useProfile();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { toast } = useToast();
 
@@ -85,7 +87,7 @@ export function UserMenu() {
           ) : (
             <User className="h-4 w-4 mr-2" />
           )}
-          {user.email?.split('@')[0]}
+          {profile?.display_name || user.email?.split('@')[0]}
           {subscription_tier && (
             <span className="ml-2 text-xs opacity-80">({subscription_tier})</span>
           )}
