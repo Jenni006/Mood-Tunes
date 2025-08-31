@@ -25,27 +25,21 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { tier } = await req.json();
-    if (!tier || !['Basic', 'Standard', 'Premium'].includes(tier)) {
-      throw new Error("Invalid subscription tier");
-    }
-    logStep("Received tier", { tier });
-
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
-
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
-
+    const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
+
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const { priceId } = await req.json();
+    logStep("Received price ID", { priceId });
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
+      apiVersion: "2023-10-16" 
+    });
+
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
@@ -55,30 +49,12 @@ serve(async (req) => {
       logStep("Creating new customer");
     }
 
-    // Set pricing based on tier
-    const pricingMap = {
-      'Basic': { amount: 499, name: 'Basic Plan - 3 mood playlists/day' },
-      'Standard': { amount: 999, name: 'Standard Plan - Unlimited playlists + premium features' },
-      'Premium': { amount: 1499, name: 'Premium Plan - Everything + personalized recommendations' }
-    };
-
-    const pricing = pricingMap[tier as keyof typeof pricingMap];
-    logStep("Using pricing", pricing);
-
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price_data: {
-            currency: "usd",
-            product_data: { 
-              name: pricing.name,
-              description: `${tier} subscription plan for MoodTunes`
-            },
-            unit_amount: pricing.amount,
-            recurring: { interval: "month" },
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -87,7 +63,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/pricing`,
     });
 
-    logStep("Created checkout session", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created", { sessionId: session.id });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -95,7 +71,7 @@ serve(async (req) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-checkout", { message: errorMessage });
+    logStep("ERROR", { message: errorMessage });
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

@@ -102,10 +102,15 @@ const Index = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-primary-glow" />
-              <span className="text-sm font-medium text-primary-glow">Premium</span>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/pricing')}
+              className="border-primary/20 text-primary hover:bg-primary/10"
+            >
+              <Star className="h-4 w-4 mr-2" />
+              Premium
+            </Button>
             <UserMenu />
           </div>
         </div>

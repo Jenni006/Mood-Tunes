@@ -1,166 +1,285 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
-import { Check, Star, Crown, Zap } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Check, Star, Crown, Zap, ArrowLeft, Loader2 } from 'lucide-react';
 
 const plans = [
   {
-    name: 'Basic',
-    price: '$4.99',
+    id: 'free',
+    name: 'Free',
+    price: '$0',
     period: '/month',
-    icon: Zap,
+    description: 'Perfect for getting started with MoodTunes',
     features: [
-      '3 mood playlists per day',
-      'Limited skips',
+      '5 mood playlists per day',
+      'Basic artist selection',
       'Standard audio quality',
-      'Basic mood matching'
+      'Community support'
     ],
+    icon: Star,
+    priceId: null,
     popular: false
   },
   {
-    name: 'Standard',
+    id: 'premium',
+    name: 'Premium',
     price: '$9.99',
     period: '/month',
-    icon: Star,
+    description: 'Unlimited music discovery and premium features',
     features: [
       'Unlimited mood playlists',
-      'Unlimited skips',
-      'High-quality audio',
-      'Ad-free experience',
-      'Advanced mood analysis'
+      'Advanced AI recommendations',
+      'High-quality audio streaming',
+      'Offline playlist downloads',
+      'Priority support',
+      'Custom mood creation'
     ],
+    icon: Crown,
+    priceId: 'price_1QeBctRuUatE5UOF5KshzrjN', // Replace with your actual Stripe price ID
     popular: true
   },
   {
-    name: 'Premium',
-    price: '$14.99',
+    id: 'pro',
+    name: 'Pro',
+    price: '$19.99',
     period: '/month',
-    icon: Crown,
+    description: 'For music enthusiasts who want everything',
     features: [
-      'Everything in Standard',
-      'Personalized recommendations',
-      'Offline downloads',
+      'Everything in Premium',
+      'Exclusive artist content',
+      'Concert recommendations',
+      'Advanced analytics',
       'Early access to new features',
-      'Priority customer support'
+      'Personal music curator'
     ],
+    icon: Zap,
+    priceId: 'price_1QeBd8RuUatE5UOF2mKdOx8e', // Replace with your actual Stripe price ID
     popular: false
   }
 ];
 
 export default function Pricing() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { subscribed, subscription_tier, loading: subLoading, refetch } = useSubscription();
   const { toast } = useToast();
-  const [loading, setLoading] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
 
-  const handleSubscribe = async (tier: string) => {
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [user, authLoading, navigate]);
+
+  const handleSubscribe = async (priceId: string, planName: string) => {
     if (!user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to subscribe to a plan.",
-        variant: "destructive",
-      });
+      navigate('/auth');
       return;
     }
 
-    setLoading(tier);
+    setProcessingPlan(planName);
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { tier }
+        body: { priceId }
       });
 
       if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
+      
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to create checkout session",
-        variant: "destructive",
+        description: error.message || "Failed to start checkout process",
+        variant: "destructive"
       });
     } finally {
-      setLoading(null);
+      setProcessingPlan(null);
     }
   };
 
+  const handleManageSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      
+      if (error) throw error;
+      
+      // Open customer portal in a new tab
+      window.open(data.url, '_blank');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to open customer portal",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getCurrentPlan = () => {
+    if (!subscribed) return 'free';
+    return subscription_tier?.toLowerCase() || 'free';
+  };
+
+  const isCurrentPlan = (planId: string) => {
+    return getCurrentPlan() === planId;
+  };
+
+  if (authLoading || subLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-dark flex items-center justify-center">
+        <Card className="bg-card/90 backdrop-blur-sm border-primary/20 p-8">
+          <CardContent className="flex items-center space-x-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <span className="text-foreground">Loading...</span>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-primary">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Choose Your Music Journey
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Unlock the power of mood-based music discovery with our premium plans
+    <div className="min-h-screen bg-gradient-dark">
+      {/* Header */}
+      <div className="sticky top-0 z-50 bg-gradient-card backdrop-blur-md border-b border-primary/30 shadow-deep">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => navigate('/')}
+              variant="ghost"
+              size="sm"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to App
+            </Button>
+            <h1 className="text-2xl font-bold bg-gradient-accent bg-clip-text text-transparent">
+              Choose Your Plan
+            </h1>
+          </div>
+          
+          {subscribed && (
+            <Button
+              onClick={handleManageSubscription}
+              variant="outline"
+              className="border-primary/20 text-primary hover:bg-primary/10"
+            >
+              Manage Subscription
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Pricing Cards */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-foreground mb-4">
+            Unlock Your Musical Journey
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Choose the perfect plan to discover music that matches your mood, anytime, anywhere.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => {
             const Icon = plan.icon;
+            const isCurrent = isCurrentPlan(plan.id);
+            const isProcessing = processingPlan === plan.name;
+
             return (
-              <Card
-                key={plan.name}
-                className={`relative bg-card/90 backdrop-blur-sm border-primary/20 transition-all hover:scale-105 ${
-                  plan.popular ? 'ring-2 ring-primary-glow shadow-glow' : ''
-                }`}
+              <Card 
+                key={plan.id} 
+                className={`relative bg-card/90 backdrop-blur-sm border-primary/20 transition-all duration-300 hover:shadow-purple ${
+                  plan.popular ? 'ring-2 ring-primary-glow scale-105' : ''
+                } ${isCurrent ? 'bg-gradient-secondary border-primary' : ''}`}
               >
                 {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-accent text-white px-4 py-1">
-                    Most Popular
-                  </Badge>
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-accent text-white px-4 py-1 rounded-full text-sm font-medium">
+                      Most Popular
+                    </div>
+                  </div>
                 )}
-                
-                <CardHeader className="text-center pb-6">
-                  <div className="mx-auto mb-4 w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center">
-                    <Icon className="h-6 w-6 text-white" />
+
+                {isCurrent && (
+                  <div className="absolute -top-4 right-4">
+                    <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
+                      Current Plan
+                    </div>
+                  </div>
+                )}
+
+                <CardHeader className="text-center pb-8">
+                  <div className="mx-auto mb-4 w-16 h-16 bg-gradient-accent rounded-full flex items-center justify-center">
+                    <Icon className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl text-foreground">{plan.name}</CardTitle>
-                  <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                    <span className="text-muted-foreground ml-1">{plan.period}</span>
-                  </div>
                   <CardDescription className="text-muted-foreground">
-                    Perfect for {plan.name.toLowerCase()} music lovers
+                    {plan.description}
                   </CardDescription>
+                  <div className="pt-4">
+                    <span className="text-4xl font-bold text-foreground">{plan.price}</span>
+                    <span className="text-muted-foreground">{plan.period}</span>
+                  </div>
                 </CardHeader>
-                
-                <CardContent className="space-y-4">
+
+                <CardContent className="space-y-6">
                   <ul className="space-y-3">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-foreground">
-                        <Check className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                      <li key={index} className="flex items-center gap-3">
+                        <Check className="h-5 w-5 text-primary-glow flex-shrink-0" />
+                        <span className="text-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
-                  
-                  <Button
-                    onClick={() => handleSubscribe(plan.name)}
-                    disabled={loading === plan.name}
-                    className={`w-full mt-6 ${
-                      plan.popular
-                        ? 'bg-gradient-accent hover:opacity-90'
-                        : 'bg-primary hover:bg-primary-glow'
-                    } text-white transition-all`}
-                  >
-                    {loading === plan.name ? "Processing..." : `Subscribe to ${plan.name}`}
-                  </Button>
+
+                  <div className="pt-6">
+                    {plan.id === 'free' ? (
+                      <Button 
+                        className="w-full" 
+                        variant={isCurrent ? "secondary" : "outline"}
+                        disabled={isCurrent}
+                      >
+                        {isCurrent ? 'Current Plan' : 'Get Started Free'}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full bg-gradient-accent text-white hover:opacity-90"
+                        onClick={() => handleSubscribe(plan.priceId!, plan.name)}
+                        disabled={isCurrent || isProcessing}
+                      >
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : isCurrent ? (
+                          'Current Plan'
+                        ) : (
+                          `Upgrade to ${plan.name}`
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
 
+        {/* Refresh Subscription Status */}
         <div className="text-center mt-12">
-          <p className="text-white/60">
-            All plans include a 14-day free trial. Cancel anytime.
-          </p>
+          <Button
+            variant="ghost"
+            onClick={refetch}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Refresh Subscription Status
+          </Button>
         </div>
       </div>
     </div>
