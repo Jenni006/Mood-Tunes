@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserMenu } from '@/components/auth/UserMenu';
-import { MoodSelector } from '@/components/MoodSelector';
+import { ChatMoodInput } from '@/components/ChatMoodInput';
 import { ArtistSelector } from '@/components/ArtistSelector';
 import { SongList } from '@/components/SongList';
 import { useAuth } from '@/contexts/AuthContext';
@@ -115,7 +115,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {currentStep === 'mood' && (
-            <MoodSelector onMoodSelect={handleMoodSelect} />
+            <ChatMoodInput onMoodSelect={handleMoodSelect} />
           )}
           
           {currentStep === 'artist' && (
