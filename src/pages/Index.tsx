@@ -81,9 +81,9 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-primary">
+    <div className="min-h-screen bg-gradient-dark">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-primary/20">
+      <div className="sticky top-0 z-50 bg-gradient-card backdrop-blur-md border-b border-primary/30 shadow-deep">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {currentStep !== 'mood' && (

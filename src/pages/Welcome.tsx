@@ -8,13 +8,14 @@ const Welcome = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-primary">
+    <div className="min-h-screen bg-gradient-dark">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+          className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
+        <div className="absolute inset-0 bg-gradient-primary opacity-80" />
         <div className="relative container mx-auto px-4 py-20">
           <div className="text-center max-w-4xl mx-auto">
             <div className="flex items-center justify-center mb-6">
@@ -32,21 +33,21 @@ const Welcome = () => {
             
             {/* Features */}
             <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <Card className="bg-card/30 backdrop-blur-sm border-primary/20">
+              <Card className="bg-gradient-card backdrop-blur-sm border-primary/30 shadow-purple">
                 <CardContent className="p-6 text-center">
                   <Music className="h-8 w-8 text-primary-glow mx-auto mb-3" />
                   <h3 className="font-semibold mb-2">Mood-Based Discovery</h3>
                   <p className="text-sm text-muted-foreground">Choose from Happy, Sad, Romantic, Party, Chill, or Workout vibes</p>
                 </CardContent>
               </Card>
-              <Card className="bg-card/30 backdrop-blur-sm border-primary/20">
+              <Card className="bg-gradient-card backdrop-blur-sm border-primary/30 shadow-purple">
                 <CardContent className="p-6 text-center">
                   <Heart className="h-8 w-8 text-primary-glow mx-auto mb-3" />
                   <h3 className="font-semibold mb-2">Artist Selection</h3>
                   <p className="text-sm text-muted-foreground">Curated Tamil & Hindi artists to match your taste</p>
                 </CardContent>
               </Card>
-              <Card className="bg-card/30 backdrop-blur-sm border-primary/20">
+              <Card className="bg-gradient-card backdrop-blur-sm border-primary/30 shadow-purple">
                 <CardContent className="p-6 text-center">
                   <Play className="h-8 w-8 text-primary-glow mx-auto mb-3" />
                   <h3 className="font-semibold mb-2">YouTube Integration</h3>

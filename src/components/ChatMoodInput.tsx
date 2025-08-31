@@ -91,9 +91,9 @@ export function ChatMoodInput({ onMoodSelect, isLoading = false }: ChatMoodInput
   };
 
   return (
-    <Card className="max-w-2xl mx-auto h-[600px] bg-card/90 backdrop-blur-sm border-primary/20 flex flex-col">
+    <Card className="max-w-2xl mx-auto h-[600px] bg-gradient-card backdrop-blur-sm border-primary/30 shadow-deep flex flex-col">
       {/* Chat Header */}
-      <div className="p-4 border-b border-primary/20 bg-gradient-accent/10">
+      <div className="p-4 border-b border-primary/30 bg-gradient-accent/20 shadow-glow">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarFallback className="bg-gradient-accent text-white">
