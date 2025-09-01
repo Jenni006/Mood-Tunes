@@ -49,15 +49,42 @@ serve(async (req) => {
       logStep("Creating new customer");
     }
 
+    // Create dynamic pricing based on plan
+    let lineItems;
+    if (priceId === 'premium-plan') {
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Premium Subscription',
+            description: 'Unlimited music discovery and premium features'
+          },
+          unit_amount: 999, // $9.99
+          recurring: { interval: 'month' }
+        },
+        quantity: 1,
+      }];
+    } else if (priceId === 'pro-plan') {
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Pro Subscription',
+            description: 'For music enthusiasts who want everything'
+          },
+          unit_amount: 1999, // $19.99
+          recurring: { interval: 'month' }
+        },
+        quantity: 1,
+      }];
+    } else {
+      throw new Error(`Invalid plan: ${priceId}`);
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/subscription-success`,
       cancel_url: `${req.headers.get("origin")}/pricing`,

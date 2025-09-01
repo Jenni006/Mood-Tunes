@@ -40,7 +40,7 @@ const plans = [
       'Custom mood creation'
     ],
     icon: Crown,
-    priceId: 'price_1QeBctRuUatE5UOF5KshzrjN', // Replace with your actual Stripe price ID
+    priceId: 'premium-plan', // Dynamic price creation
     popular: true
   },
   {
@@ -58,7 +58,7 @@ const plans = [
       'Personal music curator'
     ],
     icon: Zap,
-    priceId: 'price_1QeBd8RuUatE5UOF2mKdOx8e', // Replace with your actual Stripe price ID
+    priceId: 'pro-plan', // Dynamic price creation
     popular: false
   }
 ];
