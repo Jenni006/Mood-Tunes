@@ -2,7 +2,7 @@
 
 A modern music discovery application that helps users find the perfect songs based on their current mood and favorite artists. Built with React, TypeScript, and powered by YouTube's music catalog with Supabase backend and Stripe subscriptions.
 
-**Tech Stack:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, Supabase, Stripe, YouTube Data API
+**Tech Stack:** React 18, TypeScript, Vite, Tailwind CSS, Supabase, Stripe, YouTube Data API
 
 ## Features
 
