@@ -1,73 +1,94 @@
-# Welcome to your Lovable project
+# MoodTunes
 
-## Project info
+A modern music discovery application that helps users find the perfect songs based on their current mood and favorite artists. Built with React, TypeScript, and powered by YouTube's music catalog with Supabase backend and Stripe subscriptions.
 
-**URL**: https://lovable.dev/projects/6888baa2-15db-400c-acc2-1a2102fc0892
+**Tech Stack:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui, Supabase, Stripe, YouTube Data API
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Mood-Based Discovery**: Select your current mood to get personalized music recommendations
+- **Artist Selection**: Choose your favorite artists to refine music suggestions
+- **YouTube Integration**: Access millions of songs through YouTube's extensive music catalog
+- **User Authentication**: Secure sign-up and login with Supabase Auth
+- **Premium Subscriptions**: Multiple subscription tiers with enhanced features
+  - Premium Plan ($9.99/month): Unlimited music discovery and premium features
+  - Pro Plan ($19.99/month): Advanced features and personal music curator
+- **Responsive Design**: Beautiful dark theme UI that works on all devices
+- **Real-time Music Search**: Instant song recommendations based on mood and artist preferences
 
-**Use Lovable**
+## Screenshots
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6888baa2-15db-400c-acc2-1a2102fc0892) and start prompting.
+![Screenshot 1](screenshots/screen1.png)  
+![Screenshot 2](screenshots/screen2.png)  
+![Screenshot 3](screenshots/screen3.png)  
+![Screenshot 4](screenshots/screen4.png)  
 
-Changes made via Lovable will be committed automatically to this repo.
+## Installation & Setup
 
-**Use your preferred IDE**
+1. Clone the repository:
+   ```bash
+   git clone <repo-link>
+   cd moodtunes
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Fill in your environment variables:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_YOUTUBE_API_KEY=your_youtube_api_key
+   STRIPE_SECRET_KEY=your_stripe_secret_key
+   ```
 
-Follow these steps:
+4. Set up Supabase:
+   - Create a new Supabase project
+   - Run the migrations in the `supabase/migrations/` directory
+   - Deploy the edge functions in `supabase/functions/`
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+5. Configure Stripe:
+   - Set up your Stripe account
+   - Configure webhook endpoints for subscription management
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+6. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Usage
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+1. **Sign Up/Login**: Create an account or sign in to access the app
+2. **Select Mood**: Choose how you're feeling from the mood options
+3. **Pick Artist**: Select an artist whose style matches your preference
+4. **Discover Music**: Get personalized song recommendations from YouTube
+5. **Upgrade to Premium**: Access unlimited features with subscription plans
 
-**Edit a file directly in GitHub**
+## API Integration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **YouTube Data API**: For music search and recommendations
+- **Supabase**: User authentication, profiles, and subscription management
+- **Stripe**: Payment processing and subscription billing
 
-**Use GitHub Codespaces**
+## Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## What technologies are used for this project?
+## License
 
-This project is built with:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Support
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/6888baa2-15db-400c-acc2-1a2102fc0892) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For support, email support@moodtunes.com or create an issue in this repository.
